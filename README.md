@@ -167,3 +167,5 @@ prefer human-reviewed code.)
 ## License
 
 [MIT](LICENSE) © 2026 ohdaepyo
+
+<!-- auto-merge pipeline verified -->
