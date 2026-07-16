@@ -157,6 +157,13 @@ python3 test_send.py      # webhook sender self-check, no network needed
 python3 test_receive.py   # JWT/signature self-check, no network needed
 ```
 
+## Contributing
+
+Pull requests are **merged automatically once CI passes** — no manual review
+gate. Keep changes small, keep the self-checks green, and add a check for any
+new logic. (Install this skill from a pinned tag rather than `main` if you
+prefer human-reviewed code.)
+
 ## License
 
 [MIT](LICENSE) © 2026 ohdaepyo
