@@ -1,6 +1,6 @@
 ---
 name: google-chat
-description: Send messages, alerts, and card notifications to Google Chat spaces via incoming webhooks — no OAuth, no Google Cloud project required. Use when the user wants to post to Google Chat (구글 챗, 구글 채팅) or send build/deploy/monitoring notifications to a Chat space.
+description: Send messages, alerts, and card notifications to Google Chat spaces via incoming webhooks — no OAuth, no Google Cloud project required. Use when the user wants to post to Google Chat or send build/deploy/monitoring notifications to a Chat space.
 ---
 
 # Google Chat (Webhook, No OAuth)

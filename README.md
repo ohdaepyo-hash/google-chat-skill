@@ -58,7 +58,7 @@ Add that line to your `~/.bashrc` / `~/.zshrc` to make it permanent.
 
 Just ask in natural language — the skill triggers automatically:
 
-> "테스트 다 통과하면 구글 챗으로 알려줘"
+> "Notify me on Google Chat when the tests pass"
 > "Send the deploy result to Google Chat as a card"
 
 ### As a CLI
@@ -129,14 +129,6 @@ Example `card.json`:
 ```bash
 python3 test_send.py   # self-check, no network needed
 ```
-
-## 한국어 요약
-
-Google Chat 스페이스의 수신 웹훅 URL 하나만으로 텍스트·스레드·카드 메시지를
-보내는 Claude Code 스킬입니다. OAuth·GCP 프로젝트·서비스 계정이 전혀 필요
-없고 의존성도 0개입니다. 설치 후 `GOOGLE_CHAT_WEBHOOK_URL`만 export하면
-"구글 챗으로 알려줘"라고 말하는 것만으로 동작합니다. 단, **발신 전용**이며
-개인 gmail 계정에서는 웹훅을 만들 수 없습니다(Workspace 전용).
 
 ## License
 
