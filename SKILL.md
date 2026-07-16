@@ -1,14 +1,16 @@
 ---
 name: google-chat
-description: Send messages, alerts, and card notifications to Google Chat spaces via incoming webhooks — no OAuth, no Google Cloud project required. Use when the user wants to post to Google Chat or send build/deploy/monitoring notifications to a Chat space.
+description: Send and receive Google Chat messages without an OAuth consent flow. Sending uses incoming webhooks (no credentials beyond a webhook URL); receiving uses a service account with app authentication. Use when the user wants to post to Google Chat, send build/deploy/monitoring notifications, or read recent messages from a Chat space.
 ---
 
-# Google Chat (Webhook, No OAuth)
+# Google Chat (No OAuth)
 
-Send messages to a Google Chat space through an incoming webhook. No OAuth flow,
-no Google Cloud project, no service account — just a webhook URL.
+Send messages to a Google Chat space through an incoming webhook, and read
+messages back with a service account — no OAuth consent flow anywhere.
 
-## Setup (one-time, done by the user)
+## Sending
+
+### Setup (one-time, done by the user)
 
 1. In Google Chat, open the target space → click the space name → **Apps & integrations** → **Webhooks** → **Add webhook**.
 2. Copy the webhook URL and export it as an environment variable:
@@ -19,13 +21,13 @@ export GOOGLE_CHAT_WEBHOOK_URL="https://chat.googleapis.com/v1/spaces/XXXX/messa
 
 The URL contains a secret token — never hardcode it in files or commit it.
 
-## Send a text message
+### Send a text message
 
 ```bash
 python3 scripts/send.py --text "Deploy finished ✅"
 ```
 
-## Reply in a thread
+### Reply in a thread
 
 A stable `--thread-key` groups messages into the same thread:
 
@@ -33,7 +35,7 @@ A stable `--thread-key` groups messages into the same thread:
 python3 scripts/send.py --text "build #124 passed" --thread-key ci-builds
 ```
 
-## Send a card
+### Send a card
 
 Write a [cardsV2](https://developers.google.com/workspace/chat/api/reference/rest/v1/cards) payload to a JSON file and:
 
@@ -60,13 +62,45 @@ Example `card.json`:
 }
 ```
 
-## Text formatting
+### Text formatting
 
 Google Chat webhook text supports: `*bold*`, `_italic_`, `~strike~`, `` `code` ``,
 ```` ```code block``` ````, `<https://url|link text>`, and `<users/all>` to notify everyone.
 
+## Receiving
+
+Reading messages has no fully credential-free path — Google requires it — but
+it works **without any OAuth consent flow** via service account app
+authentication. Zero pip dependencies: the JWT is signed with the `openssl`
+binary.
+
+### Setup (one-time, done by the user — needs Workspace admin, ~10 minutes)
+
+1. Create a [Google Cloud project](https://console.cloud.google.com) and enable the **Google Chat API**.
+2. In **Google Chat API → Configuration**, set up the Chat app (name, avatar, description; app status **Live**; visibility: your domain).
+3. Create a **service account** in the project and download its JSON key. Store it outside the repo:
+
+```bash
+export GOOGLE_CHAT_SA_KEY_FILE="$HOME/.config/google-chat-skill/sa-key.json"
+```
+
+4. As Workspace admin, approve the app's `chat.app.messages.readonly` scope — see [Set up app authorization for Chat](https://support.google.com/a/answer/15137461).
+5. In Google Chat, **add the Chat app to the target space** (the app can only read spaces it is a member of).
+
+### Read messages
+
+```bash
+# latest 25 messages as JSON lines
+python3 scripts/receive.py --space spaces/AAAA1234
+
+# human-readable, only messages after a timestamp
+python3 scripts/receive.py --space AAAA1234 --plain --since "2026-07-16T00:00:00Z" --limit 50
+```
+
+The space ID is in the space's URL: `https://mail.google.com/chat/u/0/#chat/space/AAAA1234`.
+
 ## Limits (be honest with the user about these)
 
-- **Send-only.** Reading messages requires the Chat API with OAuth or a service account — out of scope for this skill.
-- Webhooks are a **Google Workspace** feature: they work in spaces, not in DMs, and are not available on personal `@gmail.com` accounts.
-- Quota is roughly 1 message/second per space; back off on HTTP 429.
+- Webhooks and the Chat API are **Google Workspace** features: spaces only, not DMs, not available on personal `@gmail.com` accounts.
+- Receiving returns **public space messages only** (no private messages) and requires the one-time admin approval above — that is Google's floor for reading; there is no credential-free read API.
+- Send quota is roughly 1 message/second per space; back off on HTTP 429.
