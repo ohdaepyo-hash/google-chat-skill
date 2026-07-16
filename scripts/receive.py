@@ -21,7 +21,7 @@ import urllib.parse
 import urllib.request
 
 TOKEN_URL = "https://oauth2.googleapis.com/token"
-CHAT_API = "https://chat.googleapis.com/v1"
+CHAT_API = os.environ.get("GOOGLE_CHAT_API_BASE", "https://chat.googleapis.com/v1")
 DEFAULT_SCOPE = "https://www.googleapis.com/auth/chat.app.messages.readonly"
 
 
